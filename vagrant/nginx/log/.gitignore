@@ -1,0 +1,3 @@
+#nginx logs
+symfony_project.access.log
+symfony_project.error.log
