@@ -26,7 +26,8 @@ composer --no-progress --prefer-dist install
 
 info "Create bash-alias 'app' for vagrant user"
 echo 'alias app="cd /app"' >> /home/vagrant/.bash_aliases
-echo 'alias phpunit="./vendor/bin/phpunit"' >> /home/vagrant/.bash_aliases
+echo 'alias console="./bin/console"' >> /home/vagrant/.bash_aliases
+echo 'alias phpunit="./vendor/bin/simple-phpunit"' >> /home/vagrant/.bash_aliases
 
 info "Enabling colorized prompt for guest console"
 sed -i "s/#force_color_prompt=yes/force_color_prompt=yes/" /home/vagrant/.bashrc
@@ -34,3 +35,6 @@ sed -i "s/#force_color_prompt=yes/force_color_prompt=yes/" /home/vagrant/.bashrc
 source /home/vagrant/.bash_aliases
 
 cd /app
+
+console doctrine:migration:migrate --no-interaction
+console doctrine:migration:migrate --no-interaction --env=test
