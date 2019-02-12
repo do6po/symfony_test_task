@@ -42,7 +42,7 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
      */
     public function assertDatabaseHas(string $repositoryClass, array $data)
     {
-        $tableName = $this->getTableNameByRepositoryClass($repositoryClass);
+        $tableName = $this->getTableNameByEntityClass($repositoryClass);
         $repository = $this->getRepositoryByClass($repositoryClass);
         $entity = $repository->findOneBy($data);
 
@@ -59,7 +59,7 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
      */
     public function assertDatabaseMissing(string $repositoryClass, array $data)
     {
-        $tableName = $this->getTableNameByRepositoryClass($repositoryClass);
+        $tableName = $this->getTableNameByEntityClass($repositoryClass);
         $repository = $this->getRepositoryByClass($repositoryClass);
         $entity = $repository->findOneBy($data);
 
@@ -83,7 +83,7 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \ReflectionException
      */
-    protected function getTableNameByRepositoryClass(string $repositoryClass)
+    protected function getTableNameByEntityClass(string $repositoryClass)
     {
         return $this->entityManager->getClassMetadata($repositoryClass)->getTableName();
     }

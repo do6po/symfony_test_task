@@ -11,7 +11,6 @@ namespace Tests\AppBundle\Repository;
 
 
 use AppBundle\Entity\User;
-use AppBundle\Repository\UserRepository;
 use Tests\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
@@ -26,7 +25,7 @@ class UserRepositoryTest extends KernelTestCase
         $name = 'userName';
         $email = 'user_email@email.com';
 
-        $this->assertDatabaseMissing(UserRepository::class, [
+        $this->assertDatabaseMissing(User::class, [
             'name' => $name,
             'email' => $email,
         ]);
@@ -38,7 +37,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $this->assertDatabaseHas(UserRepository::class, [
+        $this->assertDatabaseHas(User::class, [
             'name' => $name,
             'email' => $email,
         ]);
