@@ -68,11 +68,11 @@ echo "Done!"
 info "Removing default site configuration"
 rm /etc/nginx/sites-enabled/default
 echo "Done!"
-
-info "Initailize databases for MySQL"
-mysql -uroot <<< "CREATE DATABASE symfony_project"
-mysql -uroot <<< "CREATE DATABASE symfony_project_test"
-echo "Done!"
+#
+#info "Initailize databases for MySQL"
+#mysql -uroot <<< "CREATE DATABASE symfony_project"
+#mysql -uroot <<< "CREATE DATABASE symfony_project_test"
+#echo "Done!"
 
 info "Install composer"
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

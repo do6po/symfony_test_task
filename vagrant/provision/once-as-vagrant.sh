@@ -36,5 +36,8 @@ source /home/vagrant/.bash_aliases
 
 cd /app
 
+console doctrine:database:create
+console doctrine:database:create --env=test
+
 console doctrine:migration:migrate --no-interaction
 console doctrine:migration:migrate --no-interaction --env=test
