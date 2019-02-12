@@ -8,12 +8,13 @@
          bootstrap="vendor/autoload.php"
 >
     <php>
-        <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="AppKernel" />
+        <ini name="error_reporting" value="-1"/>
+        <server name="KERNEL_CLASS" value="AppKernel"/>
     </php>
 
     <testsuites>
         <testsuite name="Project Test Suite">
+            <directory>src/*Bundle/Tests</directory>
             <directory>tests</directory>
         </testsuite>
     </testsuites>
@@ -21,11 +22,7 @@
     <filter>
         <whitelist>
             <directory>src</directory>
-            <exclude>
-                <directory>src/*Bundle/Resources</directory>
-                <directory>src/*/*Bundle/Resources</directory>
-                <directory>src/*/Bundle/*Bundle/Resources</directory>
-            </exclude>
+            <exclude></exclude>
         </whitelist>
     </filter>
 </phpunit>
