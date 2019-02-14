@@ -6,7 +6,7 @@
  * Time: 17:37
  */
 
-namespace Tests\AppBundle\Repository;
+namespace Tests\AppBundle\Entity;
 
 
 use AppBundle\Entity\User;
@@ -14,7 +14,7 @@ use Tests\AppBundle\Fixtures\UserFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\KernelTestCase;
 
-class UserRepositoryTest extends KernelTestCase
+class UserTest extends KernelTestCase
 {
     use FixtureLoaderTrait;
 

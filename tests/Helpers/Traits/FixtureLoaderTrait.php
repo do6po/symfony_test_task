@@ -37,6 +37,7 @@ trait FixtureLoaderTrait
         }
 
         $purger = new ORMPurger();
+        $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
         $executor = new ORMExecutor($this->entityManager, $purger);
         $executor->execute($loader->getFixtures());
     }

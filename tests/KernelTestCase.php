@@ -47,7 +47,7 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
         $entity = $repository->findOneBy($data);
 
         $this->assertNotNull($entity,
-            sprintf("a row in the table [%s] matches with data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
+            sprintf("In the table [%s] not found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
         );
     }
 
@@ -64,7 +64,7 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
         $entity = $repository->findOneBy($data);
 
         $this->assertNull($entity,
-            sprintf("not one row in the table: %s not matches with data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
+            sprintf("In the table: [%s] found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
         );
     }
 
