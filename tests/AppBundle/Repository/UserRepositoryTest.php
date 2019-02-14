@@ -6,11 +6,11 @@
  * Time: 17:37
  */
 
-namespace AppBundle\Tests\Repository;
+namespace Tests\AppBundle\Repository;
 
 
 use AppBundle\Entity\User;
-use AppBundle\Tests\Fixtures\UserFixture;
+use Tests\AppBundle\Fixtures\UserFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\KernelTestCase;
 
@@ -37,6 +37,7 @@ class UserRepositoryTest extends KernelTestCase
 
     /**
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \ReflectionException
      */
@@ -65,6 +66,7 @@ class UserRepositoryTest extends KernelTestCase
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \ReflectionException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function testCreateFailForUniqueName()
     {
@@ -91,6 +93,7 @@ class UserRepositoryTest extends KernelTestCase
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \ReflectionException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function testCreateFailForUniqueEmail()
     {

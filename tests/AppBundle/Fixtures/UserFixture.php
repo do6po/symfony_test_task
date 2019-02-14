@@ -6,7 +6,7 @@
  * Time: 17:59
  */
 
-namespace AppBundle\Tests\Fixtures;
+namespace Tests\AppBundle\Fixtures;
 
 
 use AppBundle\Entity\User;

@@ -1,11 +1,11 @@
 api_users_list:
       path: /api/users
-      defaults: { _controller: AppBundle:Users\User:index }
+      defaults: { _controller: AppBundle:User:index }
       methods: [GET]
 
 api_users_show:
       path: /api/users/{id}
-      defaults: { _controller: AppBundle:Users\User:show }
+      defaults: { _controller: AppBundle:User:show }
       methods: [GET]
       requirements:
           id: '\d+'

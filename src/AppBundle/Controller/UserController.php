@@ -6,15 +6,31 @@
  * Time: 18:30
  */
 
-namespace AppBundle\Controller\Users;
+namespace AppBundle\Controller;
 
 
+use AppBundle\Services\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends Controller
 {
+    /**
+     * @var UserService
+     */
+    private $userService;
+
+    /**
+     * UserController constructor.
+     *
+     * @param UserService $userService
+     */
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * @param Request $request
      * @return JsonResponse
