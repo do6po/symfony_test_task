@@ -86,8 +86,7 @@ class UserGroupTest extends KernelTestCase
 
         $group->setName($newName);
 
-        $this->entityManager->persist($group);
-        $this->entityManager->flush();
+        $this->entityManager->flush($group);
 
         $this->assertDatabaseHas(UserGroup::class, [
             'id' => $id,

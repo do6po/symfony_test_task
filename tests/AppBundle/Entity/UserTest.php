@@ -61,6 +61,47 @@ class UserTest extends KernelTestCase
     }
 
     /**
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @throws \ReflectionException
+     */
+    public function testUpdate()
+    {
+        $userId = 1;
+        $userName = 'username1';
+        $userEmail = 'username1@email.com';
+
+        $userData = [
+            'id' => $userId,
+            'name' => $userName,
+            'email' => $userEmail,
+        ];
+
+        $this->assertDatabaseHas(User::class, $userData);
+
+        $repository = $this->entityManager->getRepository(User::class);
+        $user = $repository->find($userId);
+
+        $newUserName = 'usernameNew';
+        $newUserEmail = 'newUsername@email.com';
+
+        $user->setName($newUserName);
+        $user->setEmail($newUserEmail);
+
+        $this->entityManager->flush($user);
+
+        $this->assertDatabaseHas(User::class, [
+            'id' => $userId,
+            'name' => $newUserName,
+            'email' => $newUserEmail,
+        ]);
+
+        $this->assertDatabaseMissing(User::class, $userData);
+    }
+
+    /**
      * @expectedException \Doctrine\DBAL\Exception\UniqueConstraintViolationException
      *
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
