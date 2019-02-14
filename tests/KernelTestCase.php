@@ -35,15 +35,15 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
     }
 
     /**
-     * @param string $repositoryClass
+     * @param string $entityClassName
      * @param array $data
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \ReflectionException
      */
-    public function assertDatabaseHas(string $repositoryClass, array $data)
+    public function assertDatabaseHas(string $entityClassName, array $data)
     {
-        $tableName = $this->getTableNameByEntityClass($repositoryClass);
-        $repository = $this->getRepositoryByClass($repositoryClass);
+        $tableName = $this->getTableNameByEntityClass($entityClassName);
+        $repository = $this->getRepositoryByEntityClass($entityClassName);
         $entity = $repository->findOneBy($data);
 
         $this->assertNotNull($entity,
@@ -52,15 +52,15 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
     }
 
     /**
-     * @param string $repositoryClass
+     * @param string $entityClassName
      * @param array $data
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \ReflectionException
      */
-    public function assertDatabaseMissing(string $repositoryClass, array $data)
+    public function assertDatabaseMissing(string $entityClassName, array $data)
     {
-        $tableName = $this->getTableNameByEntityClass($repositoryClass);
-        $repository = $this->getRepositoryByClass($repositoryClass);
+        $tableName = $this->getTableNameByEntityClass($entityClassName);
+        $repository = $this->getRepositoryByEntityClass($entityClassName);
         $entity = $repository->findOneBy($data);
 
         $this->assertNull($entity,
@@ -68,6 +68,9 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
         );
     }
 
+    /**
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     */
     public function tearDown()
     {
         parent::tearDown();
@@ -78,22 +81,22 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
     }
 
     /**
-     * @param string $repositoryClass
+     * @param string $entityClassName
      * @return string
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \ReflectionException
      */
-    protected function getTableNameByEntityClass(string $repositoryClass)
+    protected function getTableNameByEntityClass(string $entityClassName)
     {
-        return $this->entityManager->getClassMetadata($repositoryClass)->getTableName();
+        return $this->entityManager->getClassMetadata($entityClassName)->getTableName();
     }
 
     /**
-     * @param string $repositoryClass
+     * @param string $entityClassName
      * @return \Doctrine\ORM\EntityRepository
      */
-    protected function getRepositoryByClass(string $repositoryClass)
+    protected function getRepositoryByEntityClass(string $entityClassName)
     {
-        return $this->entityManager->getRepository($repositoryClass);
+        return $this->entityManager->getRepository($entityClassName);
     }
 }
