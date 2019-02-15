@@ -13,6 +13,7 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Tests\Helpers\AbstractFixture;
 
 /**
  * @property EntityManager entityManager
@@ -34,7 +35,10 @@ trait FixtureLoaderTrait
         $fixtureClasses = $this->fixtures();
 
         foreach ($fixtureClasses as $fixtureClass) {
-            $loader->addFixture(new $fixtureClass($this->entityManager));
+            /** @var AbstractFixture $fixture */
+            $fixture = new $fixtureClass();
+            $fixture->setEntityManager($this->entityManager);
+            $loader->addFixture($fixture);
         }
 
         $purger = new ORMPurger();

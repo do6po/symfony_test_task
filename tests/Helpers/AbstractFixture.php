@@ -22,7 +22,7 @@ abstract class AbstractFixture extends Fixture
      */
     protected $entityManager;
 
-    public function __construct(EntityManager $entityManager)
+    public function setEntityManager(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }

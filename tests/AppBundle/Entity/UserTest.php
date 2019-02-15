@@ -10,8 +10,7 @@ namespace Tests\AppBundle\Entity;
 
 
 use AppBundle\Entity\User;
-use Tests\AppBundle\Fixtures\UserFixture;
-use Tests\AppBundle\Fixtures\UsersGroupsIntermediate;
+use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\KernelTestCase;
 
@@ -22,12 +21,13 @@ class UserTest extends KernelTestCase
     public function fixtures(): array
     {
         return [
-            UserFixture::class,
+            UsersGroupsFixture::class,
         ];
     }
 
     /**
      * @throws \Doctrine\Common\DataFixtures\Exception\CircularReferenceException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function setUp()
     {

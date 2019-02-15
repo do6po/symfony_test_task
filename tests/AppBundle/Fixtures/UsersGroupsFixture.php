@@ -9,19 +9,30 @@
 namespace Tests\AppBundle\Fixtures;
 
 
-use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Tests\Helpers\AbstractFixture;
 
-class UsersGroupsIntermediate extends AbstractFixture implements DependentFixtureInterface
+class UsersGroupsFixture extends AbstractFixture implements DependentFixtureInterface
 {
     protected $dataPath = __DIR__ . '/Data/users_groups.php';
 
+    /**
+     * @param ObjectManager $manager
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
     public function load(ObjectManager $manager)
     {
-        $object = $manager->getRepository(User::class);
-        dump($object);die;
+        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder->insert('users_groups');
+
+        foreach ($this->getFixtureData() as $data) {
+            $queryBuilder->values($data);
+        }
+
+        $queryBuilder->execute();
     }
 
     public function getDependencies()
