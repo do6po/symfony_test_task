@@ -26,6 +26,7 @@ trait FixtureLoaderTrait
 
     /**
      * @throws \Doctrine\Common\DataFixtures\Exception\CircularReferenceException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function loadFixtures()
     {
@@ -33,12 +34,25 @@ trait FixtureLoaderTrait
         $fixtureClasses = $this->fixtures();
 
         foreach ($fixtureClasses as $fixtureClass) {
-            $loader->addFixture(new $fixtureClass());
+            $loader->addFixture(new $fixtureClass($this->entityManager));
         }
 
         $purger = new ORMPurger();
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
+
+        $this->disableForeignKeyChecks();
+
         $executor = new ORMExecutor($this->entityManager, $purger);
         $executor->execute($loader->getFixtures());
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function disableForeignKeyChecks()
+    {
+        $this->entityManager
+            ->getConnection()
+            ->exec('SET FOREIGN_KEY_CHECKS=0');
     }
 }

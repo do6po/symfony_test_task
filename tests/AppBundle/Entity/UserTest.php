@@ -11,6 +11,7 @@ namespace Tests\AppBundle\Entity;
 
 use AppBundle\Entity\User;
 use Tests\AppBundle\Fixtures\UserFixture;
+use Tests\AppBundle\Fixtures\UsersGroupsIntermediate;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\KernelTestCase;
 

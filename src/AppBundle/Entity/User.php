@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,6 +36,21 @@ class User
      */
     private $email;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection|UserGroup[]
+     *
+     * @ORM\ManyToMany(targetEntity="UserGroup", inversedBy="users")
+     * @ORM\JoinTable(name="users_groups")
+     */
+    private $userGroups;
+
+    /**
+     * Default constructor, initializes collections
+     */
+    public function __construct()
+    {
+        $this->userGroups = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -92,6 +108,38 @@ class User
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * @return UserGroup[]|ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function groups()
+    {
+        return $this->userGroups;
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     */
+    public function addUserGroup(UserGroup $userGroup)
+    {
+        if ($this->userGroups->contains($userGroup)) {
+            return;
+        }
+        $this->userGroups->add($userGroup);
+        $userGroup->addUser($this);
+    }
+
+    /**
+     * @param UserGroup $userGroup
+     */
+    public function removeUserGroup(UserGroup $userGroup)
+    {
+        if (!$this->userGroups->contains($userGroup)) {
+            return;
+        }
+        $this->userGroups->removeElement($userGroup);
+        $userGroup->removeUser($this);
     }
 }
 

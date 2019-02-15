@@ -9,14 +9,13 @@
 namespace Tests\AppBundle\Fixtures;
 
 
-use AppBundle\Entity\User;
 use AppBundle\Entity\UserGroup;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Tests\Helpers\AbstractFixture;
 
-class UserGroupFixture extends Fixture
+class UserGroupFixture extends AbstractFixture
 {
-    protected $dataPath = 'Data/user_groups.php';
+    protected $dataPath = __DIR__ . '/Data/user_groups.php';
 
     /**
      * Load data fixtures with the passed EntityManager
@@ -35,10 +34,5 @@ class UserGroupFixture extends Fixture
         }
 
         $manager->flush();
-    }
-
-    protected function getFixtureData()
-    {
-        return require __DIR__ . DIRECTORY_SEPARATOR . $this->dataPath;
     }
 }
