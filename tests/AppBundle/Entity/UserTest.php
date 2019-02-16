@@ -10,6 +10,8 @@ namespace Tests\AppBundle\Entity;
 
 
 use AppBundle\Entity\User;
+use AppBundle\Entity\UserGroup;
+use AppBundle\Repository\UserRepository;
 use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\KernelTestCase;
@@ -17,6 +19,11 @@ use Tests\KernelTestCase;
 class UserTest extends KernelTestCase
 {
     use FixtureLoaderTrait;
+
+    /**
+     * @var UserRepository
+     */
+    private $repository;
 
     public function fixtures(): array
     {
@@ -34,22 +41,23 @@ class UserTest extends KernelTestCase
         parent::setUp();
 
         $this->loadFixtures();
+
+        $this->repository = $this->getUserRepository();
     }
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \ReflectionException
      */
-    public function testCreate()
+    public function testCreate1()
     {
         $userArray = [
             'name' => 'userName',
             'email' => 'user_email@email.com',
         ];
 
-        $this->assertDatabaseMissing(User::class, $userArray);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userArray);
 
         $user = new User();
         $user->setName($userArray['name']);
@@ -58,15 +66,15 @@ class UserTest extends KernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $this->assertDatabaseHas(User::class, $userArray);
+        $this->assertDatabaseHas(User::TABLE_NAME, $userArray);
     }
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
-     * @throws \ReflectionException
      */
     public function testUpdate()
     {
@@ -80,10 +88,9 @@ class UserTest extends KernelTestCase
             'email' => $userEmail,
         ];
 
-        $this->assertDatabaseHas(User::class, $userData);
+        $this->assertDatabaseHas(User::TABLE_NAME, $userData);
 
-        $repository = $this->entityManager->getRepository(User::class);
-        $user = $repository->find($userId);
+        $user = $this->repository->find($userId);
 
         $newUserName = 'usernameNew';
         $newUserEmail = 'newUsername@email.com';
@@ -93,22 +100,21 @@ class UserTest extends KernelTestCase
 
         $this->entityManager->flush($user);
 
-        $this->assertDatabaseHas(User::class, [
+        $this->assertDatabaseHas(User::TABLE_NAME, [
             'id' => $userId,
             'name' => $newUserName,
             'email' => $newUserEmail,
         ]);
 
-        $this->assertDatabaseMissing(User::class, $userData);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userData);
     }
 
     /**
      * @expectedException \Doctrine\DBAL\Exception\UniqueConstraintViolationException
      *
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \ReflectionException
-     * @throws \Doctrine\ORM\ORMException
      */
     public function testCreateFailForUniqueName()
     {
@@ -117,7 +123,7 @@ class UserTest extends KernelTestCase
             'email' => 'user_email@email.com',
         ];
 
-        $this->assertDatabaseMissing(User::class, $userArray);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userArray);
 
         $user = new User();
         $user->setName($userArray['name']);
@@ -126,16 +132,15 @@ class UserTest extends KernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $this->assertDatabaseMissing(User::class, $userArray);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userArray);
     }
 
     /**
      * @expectedException \Doctrine\DBAL\Exception\UniqueConstraintViolationException
      *
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \ReflectionException
-     * @throws \Doctrine\ORM\ORMException
      */
     public function testCreateFailForUniqueEmail()
     {
@@ -144,7 +149,7 @@ class UserTest extends KernelTestCase
             'email' => 'username1@email.com',
         ];
 
-        $this->assertDatabaseMissing(User::class, $userArray);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userArray);
 
         $user = new User();
         $user->setName($userArray['name']);
@@ -153,6 +158,58 @@ class UserTest extends KernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $this->assertDatabaseMissing(User::class, $userArray);
+        $this->assertDatabaseMissing(User::TABLE_NAME, $userArray);
+    }
+
+    /**
+     * @param $userId
+     * @param $groupCount
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @dataProvider getGroupDataProvider
+     */
+    public function testGetGroups($userId, $groupCount)
+    {
+        /** @var User $user */
+        $user = $this->repository->find($userId);
+
+        $groups = $user->getGroups();
+
+        $this->assertEquals($groupCount, $groups->count());
+    }
+
+    public function getGroupDataProvider()
+    {
+        return [
+            [1, 2],
+            [2, 3],
+            [3, 4],
+        ];
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function testAddGroup()
+    {
+        /** @var User $user */
+        $userId = 1;
+        $user = $this->repository->find($userId);
+
+        $groupId = 3;
+
+        $groupRepository = $this->entityManager->getRepository(UserGroup::class);
+        $group = $groupRepository->find($groupId);
+    }
+
+    /**
+     * @return \AppBundle\Repository\UserRepository|\Doctrine\ORM\EntityRepository
+     */
+    protected function getUserRepository()
+    {
+        return $this->entityManager->getRepository(User::class);
     }
 }

@@ -27,6 +27,7 @@ class UserGroupTest extends KernelTestCase
 
     /**
      * @throws \Doctrine\Common\DataFixtures\Exception\CircularReferenceException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function setUp()
     {
@@ -36,10 +37,9 @@ class UserGroupTest extends KernelTestCase
     }
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \ReflectionException
      */
     public function testCreate()
     {
@@ -47,7 +47,7 @@ class UserGroupTest extends KernelTestCase
             'name' => 'New Group 5',
         ];
 
-        $this->assertDatabaseMissing(UserGroup::class, $groupArray);
+        $this->assertDatabaseMissing(UserGroup::TABLE_NAME, $groupArray);
 
         $group = new UserGroup();
         $group->setName($groupArray['name']);
@@ -55,15 +55,15 @@ class UserGroupTest extends KernelTestCase
         $this->entityManager->persist($group);
         $this->entityManager->flush();
 
-        $this->assertDatabaseHas(UserGroup::class, $groupArray);
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, $groupArray);
     }
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
-     * @throws \ReflectionException
      */
     public function testUpdate()
     {
@@ -75,7 +75,7 @@ class UserGroupTest extends KernelTestCase
             'name' => $oldName
         ];
 
-        $this->assertDatabaseHas(UserGroup::class, $groupArray);
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, $groupArray);
 
         $repository = $this->entityManager->getRepository(UserGroup::class);
 
@@ -88,11 +88,11 @@ class UserGroupTest extends KernelTestCase
 
         $this->entityManager->flush($group);
 
-        $this->assertDatabaseHas(UserGroup::class, [
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
             'id' => $id,
             'name' => $newName
         ]);
 
-        $this->assertDatabaseMissing(UserGroup::class, $groupArray);
+        $this->assertDatabaseMissing(UserGroup::TABLE_NAME, $groupArray);
     }
 }

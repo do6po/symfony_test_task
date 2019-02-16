@@ -9,6 +9,7 @@
 namespace Tests;
 
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,43 +35,6 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
         $this->entityManager = $this->container->get('doctrine')->getManager();
     }
 
-    /**
-     * @param string $entityClassName
-     * @param array $data
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \ReflectionException
-     */
-    public function assertDatabaseHas(string $entityClassName, array $data)
-    {
-        $tableName = $this->getTableNameByEntityClass($entityClassName);
-        $repository = $this->getRepositoryByEntityClass($entityClassName);
-        $entity = $repository->findOneBy($data);
-
-        $this->assertNotNull($entity,
-            sprintf("In the table [%s] not found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
-        );
-    }
-
-    /**
-     * @param string $entityClassName
-     * @param array $data
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \ReflectionException
-     */
-    public function assertDatabaseMissing(string $entityClassName, array $data)
-    {
-        $tableName = $this->getTableNameByEntityClass($entityClassName);
-        $repository = $this->getRepositoryByEntityClass($entityClassName);
-        $entity = $repository->findOneBy($data);
-
-        $this->assertNull($entity,
-            sprintf("In the table: [%s] found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
-        );
-    }
-
-    /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     */
     public function tearDown()
     {
         parent::tearDown();
@@ -81,22 +45,61 @@ class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
     }
 
     /**
-     * @param string $entityClassName
-     * @return string
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \ReflectionException
+     * @param string $tableName
+     * @param array $data
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      */
-    protected function getTableNameByEntityClass(string $entityClassName)
+    public function assertDatabaseHas(string $tableName, array $data)
     {
-        return $this->entityManager->getClassMetadata($entityClassName)->getTableName();
+        $result = $this->findInTableByCondition($tableName, $data);
+
+        $this->assertTrue(count($result) > 0 ,
+            sprintf("In the table [%s] not found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
+        );
     }
 
     /**
-     * @param string $entityClassName
-     * @return \Doctrine\ORM\EntityRepository
+     * @param string $tableName
+     * @param array $data
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      */
-    protected function getRepositoryByEntityClass(string $entityClassName)
+    public function assertDatabaseMissing(string $tableName, array $data)
     {
-        return $this->entityManager->getRepository($entityClassName);
+        $result = $this->findInTableByCondition($tableName, $data);
+
+        $this->assertTrue(count($result) === 0 ,
+            sprintf("In the table: [%s] found data %s.\n", $tableName, json_encode($data, JSON_PRETTY_PRINT))
+        );
+    }
+
+    protected function getQueryBuilder()
+    {
+        return new QueryBuilder($this->entityManager->getConnection());
+    }
+
+    /**
+     * @param string $tableName
+     * @param array $condition
+     *
+     * @return array
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
+    public function findInTableByCondition(string $tableName, array $condition)
+    {
+        $query = $this->getQueryBuilder();
+
+        $query->select('*')
+            ->from($tableName);
+
+        foreach ($condition as $key => $value) {
+            $query->andWhere(sprintf('%s = %s', $key, $query->createPositionalParameter($value)));
+        }
+
+        return $query->execute()->fetchAll();
     }
 }

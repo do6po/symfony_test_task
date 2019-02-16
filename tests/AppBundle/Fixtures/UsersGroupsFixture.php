@@ -20,6 +20,7 @@ class UsersGroupsFixture extends AbstractFixture implements DependentFixtureInte
 
     /**
      * @param ObjectManager $manager
+     *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      */
@@ -30,9 +31,8 @@ class UsersGroupsFixture extends AbstractFixture implements DependentFixtureInte
 
         foreach ($this->getFixtureData() as $data) {
             $queryBuilder->values($data);
+            $queryBuilder->execute();
         }
-
-        $queryBuilder->execute();
     }
 
     public function getDependencies()

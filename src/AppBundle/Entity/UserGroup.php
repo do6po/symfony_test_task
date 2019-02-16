@@ -8,11 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UserGroup
  *
- * @ORM\Table(name="user_groups")
+ * @ORM\Table(name=UserGroup::TABLE_NAME)
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserGroupRepository")
  */
 class UserGroup
 {
+    const TABLE_NAME = 'user_groups';
+
     /**
      * @var int
      *
@@ -88,26 +90,34 @@ class UserGroup
 
     /**
      * @param User $user
+     * @return $this
      */
     public function addUser(User $user)
     {
         if ($this->users->contains($user)) {
-            return;
+            return $this;
         }
+
         $this->users->add($user);
         $user->addUserGroup($this);
+
+        return $this;
     }
 
     /**
      * @param User $user
+     * @return $this
      */
     public function removeUser(User $user)
     {
         if (!$this->users->contains($user)) {
-            return;
+            return $this;
         }
+
         $this->users->removeElement($user);
         $user->removeUserGroup($this);
+
+        return $this;
     }
 }
 
