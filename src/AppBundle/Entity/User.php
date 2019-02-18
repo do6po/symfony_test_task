@@ -41,7 +41,7 @@ class User
     /**
      * @var \Doctrine\Common\Collections\Collection|UserGroup[]
      *
-     * @ORM\ManyToMany(targetEntity="UserGroup", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="UserGroup", inversedBy="users", cascade={"remove", "persist"})
      * @ORM\JoinTable(name="users_groups")
      */
     private $userGroups;
