@@ -48,6 +48,7 @@ class UserTest extends KernelTestCase
     /**
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function testCreate1()
@@ -114,6 +115,7 @@ class UserTest extends KernelTestCase
      *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function testCreateFailForUniqueName()
@@ -140,6 +142,7 @@ class UserTest extends KernelTestCase
      *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function testCreateFailForUniqueEmail()
@@ -189,6 +192,8 @@ class UserTest extends KernelTestCase
     }
 
     /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -200,9 +205,59 @@ class UserTest extends KernelTestCase
         $user = $this->repository->find($userId);
 
         $groupId = 3;
+        $group = $this->entityManager
+            ->getRepository(UserGroup::class)
+            ->find($groupId);
 
-        $groupRepository = $this->entityManager->getRepository(UserGroup::class);
-        $group = $groupRepository->find($groupId);
+        $this->assertDatabaseMissing('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+
+        $user->addUserGroup($group);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->assertDatabaseHas('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function testRemoveGroup()
+    {
+        $userId = 1;
+        /** @var User $user */
+        $user = $this->getUserRepository()
+            ->find($userId);
+
+        $groupId = 1;
+        /** @var UserGroup $group */
+        $group = $this->entityManager
+            ->getRepository(UserGroup::class)
+            ->find($groupId);
+
+        $this->assertDatabaseHas('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+
+        $user->removeUserGroup($group);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->assertDatabaseMissing('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
     }
 
     /**
