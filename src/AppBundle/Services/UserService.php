@@ -9,6 +9,7 @@
 namespace AppBundle\Services;
 
 
+use AppBundle\Entity\User;
 use AppBundle\Repository\UserRepository;
 
 class UserService
@@ -27,8 +28,47 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function add()
+    /**
+     * @param int $id
+     * @return User|null|object
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function find(int $id)
     {
+        return $this->userRepository->find($id);
+    }
 
+    /**
+     * @param string $name
+     * @param string $email
+     * @return User
+     */
+    public function add(string $name, string $email)
+    {
+        $user = new User();
+        $user->setName($name);
+        $user->setEmail($email);
+
+        $this->save($user);
+
+        return $user;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function save(User $user)
+    {
+        $this->userRepository->save($user);
+    }
+
+    /**
+     * @param User $user
+     */
+    public function delete(User $user)
+    {
+        $this->userRepository->remove($user);
     }
 }
