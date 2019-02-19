@@ -51,7 +51,7 @@ class UserTest extends KernelTestCase
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function testCreate1()
+    public function testCreate()
     {
         $userArray = [
             'name' => 'userName',
@@ -257,38 +257,6 @@ class UserTest extends KernelTestCase
         $this->assertDatabaseMissing('users_groups', [
             'user_id' => $userId,
             'user_group_id' => $groupId,
-        ]);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    public function testRemoveUser()
-    {
-        $userId = 2;
-        /** @var User $user */
-        $user = $this->getUserRepository()->find($userId);
-
-        $this->assertDatabaseHas(User::TABLE_NAME, [
-            'id' => $userId,
-        ]);
-
-        $this->assertDatabaseHas('users_groups', [
-            'user_id' => $userId,
-        ]);
-
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
-
-        $this->assertDatabaseMissing(User::TABLE_NAME, [
-            'id' => $userId
-        ]);
-
-        $this->assertDatabaseMissing('users_groups', [
-            'user_id' => $userId,
         ]);
     }
 

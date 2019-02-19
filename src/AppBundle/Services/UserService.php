@@ -11,6 +11,7 @@ namespace AppBundle\Services;
 
 use AppBundle\Entity\User;
 use AppBundle\Repository\UserRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserService
 {
@@ -57,6 +58,26 @@ class UserService
     }
 
     /**
+     * @param int $id
+     * @param string $name
+     * @param string $email
+     * @return User
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function edit(int $id, string $name, string $email): User
+    {
+        $user = $this->findOrFail($id);
+
+        $user->setName($name);
+        $user->setEmail($email);
+        $this->userRepository->save($user);
+
+        return $user;
+    }
+
+    /**
      * @param User $user
      */
     public function save(User $user)
@@ -70,5 +91,22 @@ class UserService
     public function delete(User $user)
     {
         $this->userRepository->remove($user);
+    }
+
+    /**
+     * @param int $id
+     * @return User
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    protected function findOrFail(int $id)
+    {
+        /** @var User $user */
+        if (($user = $this->userRepository->find($id)) !== null) {
+            return $user;
+        }
+
+        throw new NotFoundHttpException(sprintf('User with id: %s - not found!', $id));
     }
 }

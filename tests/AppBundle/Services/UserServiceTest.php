@@ -102,4 +102,9 @@ class UserServiceTest extends KernelTestCase
             [4],
         ];
     }
+
+    public function testEdit()
+    {
+
+    }
 }
