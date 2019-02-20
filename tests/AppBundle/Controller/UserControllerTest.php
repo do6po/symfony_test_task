@@ -9,10 +9,14 @@
 namespace Tests\AppBundle\Controller;
 
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+use Tests\Helpers\Traits\FixtureLoaderTrait;
+use Tests\WebTestCase;
 
 class UserControllerTest extends WebTestCase
 {
+    use FixtureLoaderTrait;
+
     public function testList()
     {
         $client = static::createClient();
@@ -21,6 +25,10 @@ class UserControllerTest extends WebTestCase
         $response = $client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertJson($response->getContent());
+
+        dump(json_decode($response));die;
+
+//        $this->assertEquals(7, );
     }
 
     public function testShow()

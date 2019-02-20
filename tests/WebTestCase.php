@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: box
- * Date: 11.02.19
- * Time: 19:00
+ * Date: 20.02.19
+ * Time: 12:53
  */
 
 namespace Tests;
@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tests\Helpers\Traits\DatabaseFinderTrait;
 
-class KernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
+class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
 {
     use DatabaseFinderTrait;
 

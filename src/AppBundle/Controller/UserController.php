@@ -32,12 +32,13 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
-        return new JsonResponse(['action' => 'index']);
+        return new JsonResponse(
+            $this->userService->findAll()
+        );
     }
 
     /**

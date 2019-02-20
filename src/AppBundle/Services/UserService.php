@@ -39,6 +39,16 @@ class UserService
         $this->groupRepository = $groupRepository;
     }
 
+    public function findAll(): array
+    {
+        return $this->userRepository->findAll();
+    }
+
+    public function findGroupsAll(): array
+    {
+        return $this->groupRepository->findAll();
+    }
+
     /**
      * @param int $id
      * @return User|null|object
