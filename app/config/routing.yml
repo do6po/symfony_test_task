@@ -3,9 +3,21 @@ api_users_list:
       defaults: { _controller: AppBundle:User:index }
       methods: [GET]
 
-api_users_show:
+api_users_create:
+      path: /api/users
+      defaults: { _controller: AppBundle:User:create, _forma: json}
+      methods: [POST]
+
+api_users_edit:
       path: /api/users/{id}
-      defaults: { _controller: AppBundle:User:show }
-      methods: [GET]
+      defaults: { _controller: AppBundle:User:edit, _forma: json}
+      methods: [PUT]
+      requirements:
+          id: '\d+'
+
+api_users_delete:
+      path: /api/users/{id}
+      defaults: { _controller: AppBundle:User:delete}
+      methods: [DELETE]
       requirements:
           id: '\d+'

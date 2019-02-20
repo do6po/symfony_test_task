@@ -41,13 +41,45 @@ class UserController extends Controller
         );
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function showAction(Request $request)
+    public function createAction(Request $request)
     {
-        return new JsonResponse(['action' => 'show']);
+        $name = $request->get('name');
+        $email = $request->get('email');
+
+        return new JsonResponse(
+            $this->userService->add($name, $email)
+        );
+    }
+
+    /**
+     * @param int $id
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function editAction(int $id, Request $request)
+    {
+        $name = $request->get('name');
+        $email = $request->get('email');
+
+        return new JsonResponse(
+            $this->userService->edit($id, $name, $email)
+        );
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function deleteAction(int $id)
+    {
+        return new JsonResponse(
+            $this->userService->delete($id)
+        );
     }
 }

@@ -153,13 +153,29 @@ class UserService
         $this->groupRepository->save($group);
     }
 
-    public function delete(User $user): void
+    /**
+     * @param int $id
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function delete(int $id): void
     {
+        $user = $this->findOrFail($id);
+
         $this->userRepository->remove($user);
     }
 
-    public function deleteGroup($group): void
+    /**
+     * @param int $id
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function deleteGroup(int $id): void
     {
+        $group = $this->findGroupOrFail($id);
+
         $this->groupRepository->remove($group);
     }
 
