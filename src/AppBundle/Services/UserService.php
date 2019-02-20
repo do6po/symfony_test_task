@@ -80,6 +80,20 @@ class UserService
     }
 
     /**
+     * @param string $name
+     * @return UserGroup
+     */
+    public function addGroup(string $name): UserGroup
+    {
+        $group = new UserGroup();
+        $group->setName($name);
+
+        $this->saveGroup($group);
+
+        return $group;
+    }
+
+    /**
      * @param int $id
      * @param string $name
      * @param string $email
@@ -94,29 +108,47 @@ class UserService
 
         $user->setName($name);
         $user->setEmail($email);
+
         $this->userRepository->save($user);
 
         return $user;
     }
 
     /**
-     * @param User $user
+     * @param int $id
+     * @param string $name
+     * @return UserGroup
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function save(User $user)
+    public function editGroup(int $id, string $name): UserGroup
+    {
+        $group = $this->findGroupOrFail($id);
+
+        $group->setName($name);
+
+        $this->groupRepository->save($group);
+
+        return $group;
+    }
+
+    public function save(User $user): void
     {
         $this->userRepository->save($user);
     }
 
-    /**
-     * @param User $user
-     */
-    public function delete(User $user)
+    public function saveGroup(UserGroup $group): void
+    {
+        $this->groupRepository->save($group);
+    }
+
+    public function delete(User $user): void
     {
         $this->userRepository->remove($user);
     }
 
-
-    public function deleteGroup($group)
+    public function deleteGroup($group): void
     {
         $this->groupRepository->remove($group);
     }

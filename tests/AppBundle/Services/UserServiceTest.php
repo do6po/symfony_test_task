@@ -137,16 +137,18 @@ class UserServiceTest extends KernelTestCase
     }
 
     /**
+     * @param $groupId
+     *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
+     *
+     * @dataProvider deleteDataProvider
      */
-    public function testDeleteGroup()
+    public function testDeleteGroup($groupId)
     {
-        $groupId = 1;
-
         $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
             'id' => $groupId,
         ]);
@@ -166,6 +168,67 @@ class UserServiceTest extends KernelTestCase
 
         $this->assertDatabaseMissing('users_groups', [
             'user_group_id' => $groupId,
+        ]);
+    }
+
+    public function deleteGroupDataProvider()
+    {
+        return [
+            [1],
+            [2],
+            [3],
+            [4],
+        ];
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
+    public function testAddGroup()
+    {
+        $newGroupName = 'new group';
+
+        $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
+            'name' => $newGroupName
+        ]);
+
+        $group = $this->service->addGroup($newGroupName);
+        $this->assertInstanceOf(UserGroup::class, $group);
+
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
+            'name' => $newGroupName
+        ]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function testEditGroup()
+    {
+        $groupId = 1;
+        $groupName = 'Group name 1';
+
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
+            'id' => $groupId,
+            'name' => $groupName,
+        ]);
+
+        $newGroupName = 'Group name new';
+        $this->service->editGroup($groupId, $newGroupName);
+
+        $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
+            'id' => $groupId,
+            'name' => $groupName,
+        ]);
+
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
+            'id' => $groupId,
+            'name' => $newGroupName,
         ]);
     }
 }
