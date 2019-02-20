@@ -9,7 +9,7 @@
 namespace Tests\AppBundle\Controller;
 
 
-
+use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\WebTestCase;
 
@@ -17,24 +17,40 @@ class UserControllerTest extends WebTestCase
 {
     use FixtureLoaderTrait;
 
+    /**
+     * @throws \Doctrine\Common\DataFixtures\Exception\CircularReferenceException
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->loadFixtures();
+    }
+
+    public function fixtures(): array
+    {
+        return [
+            UsersGroupsFixture::class,
+        ];
+    }
+
     public function testList()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/api/users');
+        $client->request('GET', '/api/users');
 
         $response = $client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertJson($response->getContent());
 
-        dump(json_decode($response));die;
-
-//        $this->assertEquals(7, );
+        $this->assertEquals(7, count(json_decode($response->getContent())));
     }
 
     public function testShow()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/api/users/1');
+        $client->request('GET', '/api/users/1');
 
         $response = $client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
