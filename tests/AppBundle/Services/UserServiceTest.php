@@ -10,6 +10,7 @@ namespace Tests\AppBundle\Services;
 
 
 use AppBundle\Entity\User;
+use AppBundle\Entity\UserGroup;
 use AppBundle\Services\UserService;
 use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
@@ -132,6 +133,39 @@ class UserServiceTest extends KernelTestCase
             'id' => $userId,
             'name' => $editedUserName,
             'email' => $editedUserEmail
+        ]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function testDeleteGroup()
+    {
+        $groupId = 1;
+
+        $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
+            'id' => $groupId,
+        ]);
+
+        $this->assertDatabaseHas('users_groups', [
+            'user_group_id' => $groupId,
+        ]);
+
+        $group = $this->service->findGroup($groupId);
+        $this->assertInstanceOf(UserGroup::class, $group);
+
+        $this->service->deleteGroup($group);
+
+        $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
+            'id' => $groupId,
+        ]);
+
+        $this->assertDatabaseMissing('users_groups', [
+            'user_group_id' => $groupId,
         ]);
     }
 }

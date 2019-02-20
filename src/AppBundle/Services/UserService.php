@@ -10,6 +10,8 @@ namespace AppBundle\Services;
 
 
 use AppBundle\Entity\User;
+use AppBundle\Entity\UserGroup;
+use AppBundle\Repository\UserGroupRepository;
 use AppBundle\Repository\UserRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,12 +23,20 @@ class UserService
     private $userRepository;
 
     /**
-     * UserService constructor.
-     * @param UserRepository $userRepository
+     * @var UserGroupRepository
      */
-    public function __construct(UserRepository $userRepository)
+    private $groupRepository;
+
+    /**
+     * UserService constructor.
+     *
+     * @param UserRepository $userRepository
+     * @param UserGroupRepository $groupRepository
+     */
+    public function __construct(UserRepository $userRepository, UserGroupRepository $groupRepository)
     {
         $this->userRepository = $userRepository;
+        $this->groupRepository = $groupRepository;
     }
 
     /**
@@ -39,6 +49,18 @@ class UserService
     public function find(int $id)
     {
         return $this->userRepository->find($id);
+    }
+
+    /**
+     * @param int $id
+     * @return UserGroup|null|object
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function findGroup(int $id)
+    {
+        return $this->groupRepository->find($id);
     }
 
     /**
@@ -93,6 +115,12 @@ class UserService
         $this->userRepository->remove($user);
     }
 
+
+    public function deleteGroup($group)
+    {
+        $this->groupRepository->remove($group);
+    }
+
     /**
      * @param int $id
      * @return User
@@ -108,5 +136,22 @@ class UserService
         }
 
         throw new NotFoundHttpException(sprintf('User with id: %s - not found!', $id));
+    }
+
+    /**
+     * @param int $id
+     * @return UserGroup
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    protected function findGroupOrFail(int $id)
+    {
+        /** @var UserGroup $group */
+        if (($group = $this->groupRepository->find($id)) !== null) {
+            return $group;
+        }
+
+        throw new NotFoundHttpException(sprintf('Group with id: %s - not found!', $id));
     }
 }

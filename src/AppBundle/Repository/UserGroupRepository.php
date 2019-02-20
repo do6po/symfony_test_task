@@ -19,4 +19,16 @@ class UserGroupRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, UserGroup::class);
     }
+
+    public function save(UserGroup $group): void
+    {
+        $this->_em->persist($group);
+        $this->_em->flush();
+    }
+
+    public function remove(UserGroup $group): void
+    {
+        $this->_em->remove($group);
+        $this->_em->flush();
+    }
 }
