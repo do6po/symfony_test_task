@@ -103,8 +103,35 @@ class UserServiceTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
     public function testEdit()
     {
+        $userId = 1;
+        $userName = 'Username1';
+        $userEmail = 'username1@email.com';
 
+        $this->assertDatabaseHas(User::TABLE_NAME, [
+            'id' => $userId,
+            'name' => $userName,
+            'email' => $userEmail
+        ]);
+
+        $editedUserName = 'editedUserName';
+        $editedUserEmail = 'edited_user_email@example.com';
+
+        $user = $this->service->edit($userId, $editedUserName, $editedUserEmail);
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->assertDatabaseHas(User::TABLE_NAME, [
+            'id' => $userId,
+            'name' => $editedUserName,
+            'email' => $editedUserEmail
+        ]);
     }
 }
