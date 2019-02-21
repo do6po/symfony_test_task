@@ -85,9 +85,7 @@ class UserServiceTest extends KernelTestCase
             'id' => $userId
         ]);
 
-        $user = $this->service->find($userId);
-
-        $this->service->delete($user);
+        $this->service->delete($userId);
 
         $this->assertDatabaseMissing(User::TABLE_NAME, [
             'id' => $userId
@@ -157,10 +155,7 @@ class UserServiceTest extends KernelTestCase
             'user_group_id' => $groupId,
         ]);
 
-        $group = $this->service->findGroup($groupId);
-        $this->assertInstanceOf(UserGroup::class, $group);
-
-        $this->service->deleteGroup($group);
+        $this->service->deleteGroup($groupId);
 
         $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
             'id' => $groupId,

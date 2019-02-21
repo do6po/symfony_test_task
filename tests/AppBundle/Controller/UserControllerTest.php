@@ -169,4 +169,24 @@ class UserControllerTest extends WebTestCase
             'id' => $userId,
         ]);
     }
+
+//    /**
+//     * @throws \Doctrine\DBAL\DBALException
+//     * @throws \Doctrine\DBAL\Query\QueryException
+//     */
+//    public function testDeleteNotFound()
+//    {
+//        $userId = 999;
+//
+//        $this->assertDatabaseMissing(User::TABLE_NAME, [
+//            'id' => $userId,
+//        ]);
+//
+//        $client = static::createClient();
+//        $client->request('DELETE', sprintf('/api/users/%s', $userId));
+//
+//        $response = $client->getResponse();
+//
+//        $this->assertJson($response->getContent());
+//    }
 }
