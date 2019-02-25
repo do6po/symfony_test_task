@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User
@@ -28,12 +29,18 @@ class User implements JsonSerializable
     /**
      * @var string
      *
+     * @Assert\NotBlank()
+     * @Assert\Length(min="3")
+     *
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
     private $name;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank()
+     * @Assert\Email()
      *
      * @ORM\Column(name="email", type="string", length=255, unique=true)
      */

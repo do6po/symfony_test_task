@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * UserGroup
@@ -26,6 +27,9 @@ class UserGroup
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank()
+     * @Assert\Length(min="3")
      *
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
