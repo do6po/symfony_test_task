@@ -189,4 +189,72 @@ class UserControllerTest extends WebTestCase
 //
 //        $this->assertJson($response->getContent());
 //    }
+
+    /**
+     * @param $requestData
+     * @param $expectedStatus
+     * @param $expectedContent
+     *
+     * @dataProvider createWithValidation
+     */
+    public function testCreateWithValidation($requestData, $expectedStatus, $expectedContent)
+    {
+        $client = static::createClient();
+
+        $client->request('POST', sprintf('/api/users'), $requestData);
+
+        $response = $client->getResponse();
+        $content = $response->getContent();
+
+        $this->assertEquals($expectedStatus, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(json_encode($expectedContent), $content);
+    }
+
+    public function createWithValidation()
+    {
+        return [
+            'Empty fields' => [
+                [
+
+                    'name' => '',
+                    'email' => ''
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                [
+                    'name' => [
+                        'This value should not be blank.',
+                    ],
+                    'email' => [
+                        'This value should not be blank.',
+                    ],
+                ]
+            ],
+            [
+                [
+
+                    'name' => 'na',
+                    'email' => 'mail'
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                [
+                    'name' => [
+                        'This value is too short. It should have 3 characters or more.',
+                    ],
+                    'email' => ['This value is not a valid email address.'],
+                ]
+            ],
+            [
+                [
+                    'name' => 'newName',
+                    'email' => 'mail@example.com'
+                ],
+                Response::HTTP_OK,
+                [
+                    'id' => 8,
+                    'name' => 'newName',
+                    'email' => 'mail@example.com'
+                ]
+            ],
+        ];
+    }
 }

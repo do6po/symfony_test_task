@@ -38,7 +38,7 @@ class UserGroupValidationTest extends KernelTestCase
     {
         parent::tearDown();
 
-        $this->user = null;
+        $this->entity = null;
 
         $this->validator = null;
     }

@@ -9,6 +9,7 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Requests\UserRequest;
 use AppBundle\Services\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,7 +42,7 @@ class UserController extends Controller
         );
     }
 
-    public function createAction(Request $request)
+    public function createAction(UserRequest $request)
     {
         $name = $request->get('name');
         $email = $request->get('email');

@@ -3,3 +3,9 @@ services:
         class: AppBundle\Services\UserService
         public: true
         autowire: true
+
+    api_exception_subscriber:
+        class: AppBundle\EventListener\ApiExceptionSubscriber
+        arguments: []
+        tags:
+            - { name: kernel.event_subscriber }
