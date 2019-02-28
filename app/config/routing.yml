@@ -5,12 +5,12 @@ api_users_list:
 
 api_users_create:
       path: /api/users
-      defaults: { _controller: AppBundle:User:create, _forma: json}
+      defaults: { _controller: AppBundle:User:create}
       methods: [POST]
 
 api_users_edit:
       path: /api/users/{id}
-      defaults: { _controller: AppBundle:User:edit, _forma: json}
+      defaults: { _controller: AppBundle:User:edit, _format: json}
       methods: [PUT]
       requirements:
           id: '\d+'

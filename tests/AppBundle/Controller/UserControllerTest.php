@@ -205,7 +205,6 @@ class UserControllerTest extends WebTestCase
 
         $response = $client->getResponse();
         $content = $response->getContent();
-
         $this->assertEquals($expectedStatus, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedContent), $content);
     }
@@ -253,6 +252,32 @@ class UserControllerTest extends WebTestCase
                     'id' => 8,
                     'name' => 'newName',
                     'email' => 'mail@example.com'
+                ]
+            ],
+            [
+                [
+
+                    'name' => 'Username1',
+                    'email' => 'email@example.com'
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                [
+                    'name' => [
+                        'This value is already used.',
+                    ],
+                ]
+            ],
+            [
+                [
+
+                    'name' => 'Username99',
+                    'email' => 'username1@email.com'
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                [
+                    'email' => [
+                        'This value is already used.',
+                    ],
                 ]
             ],
         ];

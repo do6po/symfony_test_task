@@ -2,9 +2,12 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Interfaces\FillableFromRequestInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -12,8 +15,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Table(name=User::TABLE_NAME)
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ *
+ * @UniqueEntity(fields={"name"})
+ * @UniqueEntity(fields={"email"})
+ *
  */
-class User implements JsonSerializable
+class User implements JsonSerializable, FillableFromRequestInterface
 {
     const TABLE_NAME = 'users';
 
@@ -174,6 +181,18 @@ class User implements JsonSerializable
             'name' => $this->name,
             'email' => $this->email,
         ];
+    }
+
+    /**
+     * @param Request $request
+     * @return $this|FillableFromRequestInterface
+     */
+    public function fillByRequest(Request $request)
+    {
+        $this->name = $request->get('name');
+        $this->email = $request->get('email');
+
+        return $this;
     }
 }
 

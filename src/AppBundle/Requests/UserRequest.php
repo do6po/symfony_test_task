@@ -9,23 +9,13 @@
 namespace AppBundle\Requests;
 
 
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use AppBundle\Entity\User;
+use AppBundle\Interfaces\FillableFromRequestInterface;
 
 class UserRequest extends AbstractRequest
 {
-    public function rules(): array
+    public function getFillableFromRequestObject(): FillableFromRequestInterface
     {
-        return [
-            'name' => [
-                new Length(['min' => 3]),
-                new NotBlank(),
-            ],
-            'email' => [
-                new Email(),
-                new NotBlank(),
-            ]
-        ];
+        return new User();
     }
 }

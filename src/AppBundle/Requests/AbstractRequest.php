@@ -10,10 +10,12 @@ namespace AppBundle\Requests;
 
 
 use AppBundle\Exceptions\RequestValidationErrorException;
-use http\Env\Request;
+use AppBundle\Interfaces\FillableFromRequestInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -30,13 +32,20 @@ abstract class AbstractRequest
     protected $request;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * AbstractRequest constructor.
-     *
+     * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @throws RequestValidationErrorException
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(ContainerInterface $container, RequestStack $requestStack)
     {
+        $this->container = $container;
+
         $this->request = $requestStack->getCurrentRequest();
 
         $this->processed();
@@ -54,38 +63,26 @@ abstract class AbstractRequest
         }
     }
 
-    abstract public function rules(): array;
+    abstract public function getFillableFromRequestObject(): FillableFromRequestInterface;
 
     public function validate()
     {
         $validator = $this->getValidator();
 
-        foreach ($this->rules() as $attribute => $constraints) {
-            $violations = $validator->validate(
-                $this->request->get($attribute),
-                $constraints
-            );
+        $dto = $this->getFillableFromRequestObject();
 
-            if ($violations->count()) {
-                $this->pushToErrors($attribute, $this->extractErrors($violations));
-            }
-        }
-    }
+        $dto->fillByRequest($this->request);
+        $violations = $validator->validate($dto);
 
-    public function pushToErrors(string $attribute, array $violationList)
-    {
-        $this->errors[$attribute] = $violationList;
+        $this->extractErrors($violations);
     }
 
     public function extractErrors(ConstraintViolationListInterface $violationList)
     {
-        $errors = [];
-
         foreach ($violationList as $item) {
-            $errors[] = $item->getMessage();
+            /** @var ConstraintViolation $item */
+            $this->errors[$item->getPropertyPath()][] = $item->getMessage();
         }
-
-        return $errors;
     }
 
     public function hasErrors(): bool
@@ -100,7 +97,7 @@ abstract class AbstractRequest
 
     private function getValidator(): ValidatorInterface
     {
-        return Validation::createValidator();
+        return $this->container->get('validator');
     }
 
     /**

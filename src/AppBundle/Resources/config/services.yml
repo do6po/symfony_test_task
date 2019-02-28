@@ -9,3 +9,10 @@ services:
         arguments: []
         tags:
             - { name: kernel.event_subscriber }
+
+    doctrine.orm.validator.unique:
+        class: Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator
+        autowire: true
+        public: true
+        tags:
+            - { name: validator.constraint_validator }
