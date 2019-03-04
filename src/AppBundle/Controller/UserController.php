@@ -9,13 +9,15 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Requests\UserRequest;
+use AppBundle\Entity\User;
+use AppBundle\Exceptions\NotFoundHttpException;
+use AppBundle\Exceptions\RequestValidationErrorException;
 use AppBundle\Services\UserService;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserController extends Controller
+class UserController extends BasicController
 {
     /**
      * @var UserService
@@ -42,45 +44,65 @@ class UserController extends Controller
         );
     }
 
-    public function createAction(UserRequest $request)
+    /**
+     * @ParamConverter("user", class="AppBundle\Repository\UserRepository")
+     *
+     * @param Request $request
+     * @param User $user
+     * @return JsonResponse
+     * @throws RequestValidationErrorException
+     */
+    public function createAction(Request $request, User $user)
     {
-        $name = $request->get('name');
-        $email = $request->get('email');
+        $user->fillByRequest($request);
+
+        $this->validate($user);
 
         return new JsonResponse(
-            $this->userService->add($name, $email)
+            $this->userService->add($user)
         );
     }
 
     /**
-     * @param int $id
      * @param Request $request
+     * @param User $user
      * @return JsonResponse
+     * @throws RequestValidationErrorException
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function editAction(int $id, Request $request)
+    public function editAction(Request $request, User $user = null)
     {
-        $name = $request->get('name');
-        $email = $request->get('email');
+        if (is_null($user)) {
+            throw new NotFoundHttpException([
+                'error' => sprintf('User with id: %s - not found!', $request->get('id'))
+            ]);
+        }
+
+        $user->fillByRequest($request);
+
+        $this->validate($user);
 
         return new JsonResponse(
-            $this->userService->edit($id, $name, $email)
+            $this->userService->edit($user)
         );
     }
 
     /**
      * @param int $id
      * @return JsonResponse
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public function deleteAction(int $id)
     {
-        return new JsonResponse(
-            $this->userService->delete($id)
-        );
+        $this->userService->delete($id);
+
+        return new JsonResponse(['delete' => true]);
     }
+
 }
