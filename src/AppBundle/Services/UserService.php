@@ -11,9 +11,9 @@ namespace AppBundle\Services;
 
 use AppBundle\Entity\User;
 use AppBundle\Entity\UserGroup;
+use AppBundle\Exceptions\NotFoundHttpException;
 use AppBundle\Repository\UserGroupRepository;
 use AppBundle\Repository\UserRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserService
 {
@@ -74,16 +74,11 @@ class UserService
     }
 
     /**
-     * @param string $name
-     * @param string $email
-     * @return User
+     * @param $user
+     * @return mixed
      */
-    public function add(string $name, string $email)
+    public function add($user)
     {
-        $user = new User();
-        $user->setName($name);
-        $user->setEmail($email);
-
         $this->save($user);
 
         return $user;
@@ -104,20 +99,16 @@ class UserService
     }
 
     /**
-     * @param int $id
-     * @param string $name
-     * @param string $email
+     * @param User $user
      * @return User
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function edit(int $id, string $name, string $email): User
+    public function edit($user): User
     {
-        $user = $this->findOrFail($id);
-
-        $user->setName($name);
-        $user->setEmail($email);
+        $this->findOrFail($user->getId());
 
         $this->userRepository->save($user);
 
@@ -128,6 +119,7 @@ class UserService
      * @param int $id
      * @param string $name
      * @return UserGroup
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -155,6 +147,7 @@ class UserService
 
     /**
      * @param int $id
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -168,6 +161,7 @@ class UserService
 
     /**
      * @param int $id
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -182,6 +176,7 @@ class UserService
     /**
      * @param int $id
      * @return User
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -193,12 +188,15 @@ class UserService
             return $user;
         }
 
-        throw new NotFoundHttpException(sprintf('User with id: %s - not found!', $id));
+        throw new NotFoundHttpException([
+            'error' => sprintf('User with id: %s - not found!', $id),
+        ]);
     }
 
     /**
      * @param int $id
      * @return UserGroup
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
@@ -210,6 +208,8 @@ class UserService
             return $group;
         }
 
-        throw new NotFoundHttpException(sprintf('Group with id: %s - not found!', $id));
+        throw new NotFoundHttpException([
+            'error' => sprintf('Group with id: %s - not found!', $id),
+        ]);
     }
 }

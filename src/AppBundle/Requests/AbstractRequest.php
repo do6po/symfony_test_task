@@ -37,10 +37,16 @@ abstract class AbstractRequest
     protected $container;
 
     /**
+     * @var Object
+     */
+    protected $entity;
+
+    /**
      * AbstractRequest constructor.
      * @param ContainerInterface $container
      * @param RequestStack $requestStack
      * @throws RequestValidationErrorException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function __construct(ContainerInterface $container, RequestStack $requestStack)
     {
@@ -53,6 +59,7 @@ abstract class AbstractRequest
 
     /**
      * @throws RequestValidationErrorException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function processed()
     {
@@ -65,16 +72,21 @@ abstract class AbstractRequest
 
     abstract public function getFillableFromRequestObject(): FillableFromRequestInterface;
 
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function validate()
     {
-        $validator = $this->getValidator();
+        $entity = $this->getFillableFromRequestObject();
+        $entity->fillByRequest($this->request);
 
-        $dto = $this->getFillableFromRequestObject();
+        $this->entity = $this->container
+            ->get('doctrine.orm.default_entity_manager')
+            ->merge($entity);
 
-        $dto->fillByRequest($this->request);
-        $violations = $validator->validate($dto);
-
-        $this->extractErrors($violations);
+        $this->extractErrors(
+            $this->getValidator()->validate($this->entity)
+        );
     }
 
     public function extractErrors(ConstraintViolationListInterface $violationList)
@@ -93,6 +105,11 @@ abstract class AbstractRequest
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    public function getFilledEntity()
+    {
+        return $this->entity;
     }
 
     private function getValidator(): ValidatorInterface

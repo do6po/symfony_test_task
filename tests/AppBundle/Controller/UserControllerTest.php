@@ -282,4 +282,51 @@ class UserControllerTest extends WebTestCase
             ],
         ];
     }
+
+    /**
+     * @param $requestData
+     * @param $expectedStatus
+     * @param $expectedContent
+     *
+     * @dataProvider editWithValidation
+     */
+    public function testEditWithValidation($requestData, $expectedStatus, $expectedContent)
+    {
+        $client = static::createClient();
+
+        $client->request('PUT', sprintf('/api/users/%s', $requestData['id']), $requestData);
+
+        $response = $client->getResponse();
+        $content = $response->getContent();
+        $this->assertEquals($expectedStatus, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(json_encode($expectedContent), $content);
+    }
+
+    public function editWithValidation()
+    {
+        return [
+            [
+                [
+                    'id' => 99,
+                    'name' => 'username99',
+                    'email' => 'email@example.com',
+                ],
+                404,
+                ['error' => 'User with id: 99 - not found!']
+            ],
+            [
+                [
+                    'id' => 1,
+                    'name' => 'Username1',
+                    'email' => 'new.username1@email.com',
+                ],
+                200,
+                [
+                    'id' => 1,
+                    'name' => 'Username1',
+                    'email' => 'new.username1@email.com',
+                ]
+            ],
+        ];
+    }
 }

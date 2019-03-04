@@ -59,7 +59,12 @@ class UserServiceTest extends KernelTestCase
             'email' => $userEmail
         ]);
 
-        $user = $this->service->add($userName, $userEmail);
+        $newUser = new User();
+        $newUser->setName($userName);
+        $newUser->setEmail($userEmail);
+
+        $user = $this->service->add($newUser);
+
         $this->assertInstanceOf(User::class, $user);
 
         $this->assertDatabaseHas(User::TABLE_NAME, [
@@ -70,7 +75,7 @@ class UserServiceTest extends KernelTestCase
 
     /**
      * @param $userId
-     *
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
@@ -103,6 +108,7 @@ class UserServiceTest extends KernelTestCase
     }
 
     /**
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
@@ -121,10 +127,15 @@ class UserServiceTest extends KernelTestCase
             'email' => $userEmail
         ]);
 
+        $editUser = $this->service->find($userId);
+
         $editedUserName = 'editedUserName';
         $editedUserEmail = 'edited_user_email@example.com';
 
-        $user = $this->service->edit($userId, $editedUserName, $editedUserEmail);
+        $editUser->setName($editedUserName);
+        $editUser->setEmail($editedUserEmail);
+
+        $user = $this->service->edit($editUser);
         $this->assertInstanceOf(User::class, $user);
 
         $this->assertDatabaseHas(User::TABLE_NAME, [
@@ -136,7 +147,7 @@ class UserServiceTest extends KernelTestCase
 
     /**
      * @param $groupId
-     *
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
@@ -197,6 +208,7 @@ class UserServiceTest extends KernelTestCase
     }
 
     /**
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
      * @throws \Doctrine\ORM\ORMException
