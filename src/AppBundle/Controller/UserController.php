@@ -93,6 +93,7 @@ class UserController extends BasicController
     /**
      * @param int $id
      * @return JsonResponse
+     * @throws NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
