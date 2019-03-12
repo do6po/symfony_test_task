@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  web:
+    image: nginx:1.13
+    container_name: 'web'
+    hostname: 'web'
+    networks:
+      internal:
+          ipv4_address: 192.168.103.101
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/web/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/web/log:/var/log/nginx
+      - ./:/app:rw,cached
+    working_dir: /app
+    links:
+      - db
+      - php
+    restart: always
+
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+    container_name: 'php'
+    hostname: 'php'
+    networks:
+      internal:
+          ipv4_address: 192.168.103.102
+    ports:
+      - 9000:9000
+    volumes:
+      - ./:/app:rw,cached
+    working_dir: /app
+    environment:
+      - COMPOSER_ALLOW_SUPERUSER=1
+    restart: always
+    links:
+      - db
+
+  db:
+    image: mariadb
+    container_name: 'db'
+    hostname: 'db'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      internal:
+          ipv4_address: 192.168.103.103
+    ports:
+      - 3306:3306
+
+networks:
+    internal:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: 192.168.103.0/24
