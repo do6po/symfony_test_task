@@ -18,3 +18,7 @@ group table: id, name
 vagrant plugin install vagrant-hostmanager
 vagrant up
 ```
+- from docker:
+```bash
+make install
+```
