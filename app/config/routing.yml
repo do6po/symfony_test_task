@@ -21,3 +21,10 @@ api_users_delete:
       methods: [DELETE]
       requirements:
           id: '\d+'
+
+root:
+      path: /
+      defaults:
+          _controller: FrameworkBundle:Redirect:urlRedirect
+          path: /api/users
+          methods: [GET]

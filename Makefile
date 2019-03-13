@@ -17,17 +17,12 @@ ssh_command = $(exec) -it
 
 build_command = $(dc) up -d --build --force-recreate
 
-start_command = $(dc) start
-stop_command = $(dc) stop
-
 ssh_to_php_command = $(ssh_command) $(php) bash
 ssh_to_web_command = $(ssh_command) $(web) bash
 ssh_to_db_command = $(ssh_command) $(db) bash
 
-ps_command = $(dc) ps
-ps_quiet_command = $(ps_command) -q
-
 console = ./bin/console
+console_command = $(exec) $(php) ./bin/console
 
 composer = composer
 composer_install_command = $(exec) $(php) $(composer) --no-progress --prefer-dist install
@@ -43,10 +38,6 @@ migrate_command = $(exec) $(php) php $(migrate)
 
 migrate_test = $(migrate) --env=test
 migrate_test_command = $(exec) $(php) php $(migrate_test)
-
-rm_command = $(dc) rm
-
-rm_forced_command = $(rm_command) -f
 
 phpunit = ./vendor/bin/simple-phpunit
 run_tests_command = $(exec) $(php) $(phpunit)
@@ -78,24 +69,20 @@ install:
 	$(create_database_test_command)
 	$(migrate_command)
 	$(migrate_test_command)
+	$(console_command) cache:clear
+	$(exec) $(php) chmod 777 -R /app/var/cache
 	echo ""
 	echo "go to http://symfony_project.test"
 	echo ""
 
-start:
-	$(start_command)
-
-#Остановка
-stop:
-	$(stop_command)
-
-
-#Удаление всех контейнеров
-rm:
-	$(rm_command)
-
 ####################################################
 #Работа с приложением
+
+
+#console
+console:
+	$(console_command)
+
 #Запуск миграций
 migrate:
 	$(migrate_command)
