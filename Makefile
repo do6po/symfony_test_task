@@ -71,7 +71,7 @@ install:
 	$(migrate_test_command)
 	$(exec) $(php) chmod +x bin/console
 	$(console_command) cache:clear
-	$(exec) $(php) chmod 777 -R /app/var/cache
+	$(exec) $(php) chmod 777 -R /app/var
 	echo "####################################################"
 	echo "go to http://symfony_project.test"
 	echo "####################################################"
