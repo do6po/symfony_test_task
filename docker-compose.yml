@@ -11,8 +11,8 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./docker/web/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/web/log:/var/log/nginx
+      - ./docker/prod/web/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/storage/logs/web:/var/log/nginx
       - ./:/app:rw,cached
     working_dir: /app
     links:
@@ -23,7 +23,7 @@ services:
   php:
     build:
       context: ./
-      dockerfile: docker/php/Dockerfile
+      dockerfile: docker/prod/php/Dockerfile
     container_name: 'php'
     hostname: 'php'
     networks:
@@ -52,6 +52,8 @@ services:
           ipv4_address: 192.168.103.103
     ports:
       - 3306:3306
+#    volumes:
+#      - ./docker/storage/db:/var/lib/mysql
 
 networks:
     internal:

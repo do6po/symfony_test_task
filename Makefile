@@ -62,7 +62,25 @@ ssh_to_db:
 #Работа с контейнерами
 #Установка
 install:
+	$(d) network prune -f
 	$(build_command)
+	$(composer_install_command)
+	sleep 2
+	$(create_database_command)
+	$(migrate_command)
+	$(exec) $(php) chmod +x bin/console
+	$(console_command) cache:clear
+	$(exec) $(php) chmod 777 -R /app/var
+	echo "####################################################"
+	echo "go to http://symfony_project.test"
+	echo "####################################################"
+
+####################################################
+#Работа с контейнерами
+#Установка для разработки
+install_dev:
+	$(d) network prune -f
+	$(dc) -f docker-compose.yml -f docker-compose.dev.yml up -d --build --force-recreate
 	$(composer_install_command)
 	sleep 2
 	$(create_database_command)
@@ -79,7 +97,6 @@ install:
 ####################################################
 #Работа с приложением
 
-
 #console
 console:
 	$(console_command)
@@ -92,8 +109,5 @@ migrate_test:
 	$(migrate_test_command)
 
 #Запуск тестов
-run_tests:
-	$(run_tests_command) $(path)
-
-
-
+phpunit:
+	$(run_tests_command) $(p)
