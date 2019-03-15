@@ -69,16 +69,12 @@ class UserGroupController extends BasicController
     }
 
     /**
-     * @param int $id
+     * @param UserGroup $group
      * @return JsonResponse
-     * @throws \AppBundle\Exceptions\NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function deleteAction(int $id)
+    public function deleteAction(UserGroup $group)
     {
-        $this->userService->deleteGroup($id);
+        $this->userService->deleteGroup($group);
 
         return new JsonResponse(['delete' => true]);
     }

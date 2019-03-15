@@ -36,6 +36,13 @@ api_group_edit:
       requirements:
           id: '\d+'
 
+api_group_delete:
+      path: /api/groups/{id}
+      defaults: { _controller: AppBundle:UserGroup:delete }
+      methods: [DELETE]
+      requirements:
+          id: '\d+'
+
 root:
       path: /
       defaults:

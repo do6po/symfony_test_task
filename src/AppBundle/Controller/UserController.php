@@ -88,16 +88,12 @@ class UserController extends BasicController
     }
 
     /**
-     * @param int $id
+     * @param User $user
      * @return JsonResponse
-     * @throws NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function deleteAction(int $id)
+    public function deleteAction(User $user)
     {
-        $this->userService->delete($id);
+        $this->userService->delete($user);
 
         return new JsonResponse(['delete' => true]);
     }

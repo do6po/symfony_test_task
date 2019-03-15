@@ -128,30 +128,18 @@ class UserService
     }
 
     /**
-     * @param int $id
-     * @throws NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @param User $user
      */
-    public function delete(int $id): void
+    public function delete(User $user): void
     {
-        $user = $this->findOrFail($id);
-
         $this->userRepository->remove($user);
     }
 
     /**
-     * @param int $id
-     * @throws NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
+     * @param UserGroup $group
      */
-    public function deleteGroup(int $id): void
+    public function deleteGroup(UserGroup $group): void
     {
-        $group = $this->findGroupOrFail($id);
-
         $this->groupRepository->remove($group);
     }
 

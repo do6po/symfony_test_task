@@ -75,13 +75,8 @@ class UserServiceTest extends KernelTestCase
 
     /**
      * @param $userId
-     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
-     *
      * @dataProvider deleteDataProvider
      */
     public function testDelete($userId)
@@ -90,7 +85,9 @@ class UserServiceTest extends KernelTestCase
             'id' => $userId
         ]);
 
-        $this->service->delete($userId);
+        $user = $this->findUser($userId);
+
+        $this->service->delete($user);
 
         $this->assertDatabaseMissing(User::TABLE_NAME, [
             'id' => $userId
@@ -108,12 +105,8 @@ class UserServiceTest extends KernelTestCase
     }
 
     /**
-     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public function testEdit()
     {
@@ -127,7 +120,7 @@ class UserServiceTest extends KernelTestCase
             'email' => $userEmail
         ]);
 
-        $editUser = $this->service->find($userId);
+        $editUser = $this->findUser($userId);
 
         $editedUserName = 'editedUserName';
         $editedUserEmail = 'edited_user_email@example.com';
@@ -147,33 +140,30 @@ class UserServiceTest extends KernelTestCase
 
     /**
      * @param $groupId
-     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
-     *
      * @dataProvider deleteDataProvider
      */
     public function testDeleteGroup($groupId)
     {
+        $group = $this->findGroup($groupId);
+
         $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
-            'id' => $groupId,
+            'id' => $group->getId(),
         ]);
 
         $this->assertDatabaseHas('users_groups', [
-            'user_group_id' => $groupId,
+            'user_group_id' => $group->getId(),
         ]);
 
-        $this->service->deleteGroup($groupId);
+        $this->service->deleteGroup($group);
 
         $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
-            'id' => $groupId,
+            'id' => $group->getId(),
         ]);
 
         $this->assertDatabaseMissing('users_groups', [
-            'user_group_id' => $groupId,
+            'user_group_id' => $group->getId(),
         ]);
     }
 
@@ -199,7 +189,10 @@ class UserServiceTest extends KernelTestCase
             'name' => $newGroupName
         ]);
 
-        $group = $this->service->addGroup($newGroupName);
+        $group = new UserGroup();
+        $group->setName($newGroupName);
+
+        $group = $this->service->addGroup($group);
         $this->assertInstanceOf(UserGroup::class, $group);
 
         $this->assertDatabaseHas(UserGroup::TABLE_NAME, [
@@ -208,12 +201,8 @@ class UserServiceTest extends KernelTestCase
     }
 
     /**
-     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public function testEditGroup()
     {
@@ -225,8 +214,11 @@ class UserServiceTest extends KernelTestCase
             'name' => $groupName,
         ]);
 
+        $group = $this->findGroup($groupId);
+
         $newGroupName = 'Group name new';
-        $this->service->editGroup($groupId, $newGroupName);
+        $group->setName($newGroupName);
+        $this->service->editGroup($group);
 
         $this->assertDatabaseMissing(UserGroup::TABLE_NAME, [
             'id' => $groupId,
@@ -237,5 +229,19 @@ class UserServiceTest extends KernelTestCase
             'id' => $groupId,
             'name' => $newGroupName,
         ]);
+    }
+
+    private function findUser(int $id)
+    {
+        return $this->container->get('doctrine')
+            ->getRepository(User::class)
+            ->find($id);
+    }
+
+    private function findGroup(int $id)
+    {
+        return $this->container->get('doctrine')
+            ->getRepository(UserGroup::class)
+            ->find($id);
     }
 }

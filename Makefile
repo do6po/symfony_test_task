@@ -110,4 +110,4 @@ migrate_test:
 
 #Запуск тестов
 phpunit:
-	$(run_tests_command) $(p)
+	$(run_tests_command) $(p1) $(p2) $(p3)

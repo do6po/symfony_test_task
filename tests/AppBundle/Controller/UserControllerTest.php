@@ -11,6 +11,7 @@ namespace Tests\AppBundle\Controller;
 
 use AppBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Client;
 use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
 use Tests\WebTestCase;
@@ -18,6 +19,11 @@ use Tests\WebTestCase;
 class UserControllerTest extends WebTestCase
 {
     use FixtureLoaderTrait;
+
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
      * @throws \Doctrine\Common\DataFixtures\Exception\CircularReferenceException
@@ -28,6 +34,15 @@ class UserControllerTest extends WebTestCase
         parent::setUp();
 
         $this->loadFixtures();
+
+        $this->client = static::createClient();
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $this->client = null;
     }
 
     public function fixtures(): array
@@ -39,10 +54,9 @@ class UserControllerTest extends WebTestCase
 
     public function testList()
     {
-        $client = static::createClient();
-        $client->request('GET', '/api/users');
+        $this->client->request('GET', '/api/users');
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertJson($response->getContent());
 
@@ -55,8 +69,6 @@ class UserControllerTest extends WebTestCase
      */
     public function testCreateTypeJson()
     {
-        $client = static::createClient();
-
         $data = [
             'name' => 'newUsername',
             'email' => 'new.email@example.com'
@@ -64,7 +76,7 @@ class UserControllerTest extends WebTestCase
 
         $this->assertDatabaseMissing(User::TABLE_NAME, $data);
 
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/users',
             [], [],
@@ -72,7 +84,7 @@ class UserControllerTest extends WebTestCase
             json_encode($data)
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertJsonStringEqualsJsonString(
             json_encode([
                 'id' => 8,
@@ -91,8 +103,6 @@ class UserControllerTest extends WebTestCase
      */
     public function testCreate()
     {
-        $client = static::createClient();
-
         $data = [
             'name' => 'newUsername',
             'email' => 'new.email@example.com'
@@ -100,9 +110,9 @@ class UserControllerTest extends WebTestCase
 
         $this->assertDatabaseMissing(User::TABLE_NAME, $data);
 
-        $client->request('POST', '/api/users', $data);
+        $this->client->request('POST', '/api/users', $data);
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertJsonStringEqualsJsonString(
             json_encode([
                 'id' => 8,
@@ -121,8 +131,6 @@ class UserControllerTest extends WebTestCase
      */
     public function testEdit()
     {
-        $client = static::createClient();
-
         $id = 1;
 
         $oldData = [
@@ -140,9 +148,9 @@ class UserControllerTest extends WebTestCase
         $this->assertDatabaseHas(User::TABLE_NAME, $oldData);
         $this->assertDatabaseMissing(User::TABLE_NAME, $newData);
 
-        $client->request('PUT', sprintf('/api/users/%s', $id), $newData);
+        $this->client->request('PUT', sprintf('/api/users/%s', $id), $newData);
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(json_encode($newData), $response->getContent());
 
@@ -162,33 +170,34 @@ class UserControllerTest extends WebTestCase
             'id' => $userId,
         ]);
 
-        $client = static::createClient();
-        $client->request('DELETE', sprintf('/api/users/%s', $userId));
+        $this->client->request('DELETE', sprintf('/api/users/%s', $userId));
 
         $this->assertDatabaseMissing(User::TABLE_NAME, [
             'id' => $userId,
         ]);
     }
 
-//    /**
-//     * @throws \Doctrine\DBAL\DBALException
-//     * @throws \Doctrine\DBAL\Query\QueryException
-//     */
-//    public function testDeleteNotFound()
-//    {
-//        $userId = 999;
-//
-//        $this->assertDatabaseMissing(User::TABLE_NAME, [
-//            'id' => $userId,
-//        ]);
-//
-//        $client = static::createClient();
-//        $client->request('DELETE', sprintf('/api/users/%s', $userId));
-//
-//        $response = $client->getResponse();
-//
-//        $this->assertJson($response->getContent());
-//    }
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
+    public function testDeleteNotFound()
+    {
+        $userId = 999;
+
+        $this->assertDatabaseMissing(User::TABLE_NAME, [
+            'id' => $userId,
+        ]);
+
+        $this->client->request('DELETE', sprintf('/api/users/%s', $userId));
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            'message' => 'Not Found!',
+        ]), $response->getContent());
+    }
 
     /**
      * @param $requestData
@@ -199,11 +208,9 @@ class UserControllerTest extends WebTestCase
      */
     public function testCreateWithValidation($requestData, $expectedStatus, $expectedContent)
     {
-        $client = static::createClient();
+        $this->client->request('POST', sprintf('/api/users'), $requestData);
 
-        $client->request('POST', sprintf('/api/users'), $requestData);
-
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $content = $response->getContent();
         $this->assertEquals($expectedStatus, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedContent), $content);
@@ -292,11 +299,9 @@ class UserControllerTest extends WebTestCase
      */
     public function testEditWithValidation($requestData, $expectedStatus, $expectedContent)
     {
-        $client = static::createClient();
+        $this->client->request('PUT', sprintf('/api/users/%s', $requestData['id']), $requestData);
 
-        $client->request('PUT', sprintf('/api/users/%s', $requestData['id']), $requestData);
-
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $content = $response->getContent();
         $this->assertEquals($expectedStatus, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedContent), $content);
