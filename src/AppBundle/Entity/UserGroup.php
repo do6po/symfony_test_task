@@ -2,8 +2,11 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Interfaces\FillableFromRequestInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -11,8 +14,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Table(name=UserGroup::TABLE_NAME)
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserGroupRepository")
+ *
+ * @UniqueEntity(fields={"name"})
+ *
  */
-class UserGroup
+class UserGroup implements \JsonSerializable, FillableFromRequestInterface
 {
     const TABLE_NAME = 'user_groups';
 
@@ -120,6 +126,25 @@ class UserGroup
 
         $this->users->removeElement($user);
         $user->removeUserGroup($this);
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+        ];
+    }
+
+    /**
+     * @param Request $request
+     * @return $this
+     */
+    public function fillByRequest(Request $request)
+    {
+        $this->name = $request->get('name');
 
         return $this;
     }

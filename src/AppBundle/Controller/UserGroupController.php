@@ -2,22 +2,21 @@
 /**
  * Created by PhpStorm.
  * User: box
- * Date: 08.02.19
- * Time: 18:30
+ * Date: 15.03.19
+ * Time: 12:44
  */
 
 namespace AppBundle\Controller;
 
 
-use AppBundle\Entity\User;
-use AppBundle\Exceptions\NotFoundHttpException;
+use AppBundle\Entity\UserGroup;
 use AppBundle\Exceptions\RequestValidationErrorException;
 use AppBundle\Services\UserService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserController extends BasicController
+class UserGroupController extends BasicController
 {
     /**
      * @var UserService
@@ -35,69 +34,51 @@ class UserController extends BasicController
     }
 
     /**
-     * @return JsonResponse
-     */
-    public function indexAction()
-    {
-        return new JsonResponse(
-            $this->userService->findAll()
-        );
-    }
-
-    /**
-     * @ParamConverter("user", class="AppBundle\Repository\UserRepository")
+     * @ParamConverter("group", class="AppBundle\Repository\UserGroupRepository")
      *
      * @param Request $request
-     * @param User $user
+     * @param UserGroup $group
      * @return JsonResponse
      * @throws RequestValidationErrorException
      */
-    public function createAction(Request $request, User $user)
+    public function createAction(Request $request, UserGroup $group)
     {
-        $user->fillByRequest($request);
-
-        $this->validate($user);
+        $group->fillByRequest($request);
+        $this->validate($group);
 
         return new JsonResponse(
-            $this->userService->add($user)
+            $this->userService->addGroup($group)
         );
     }
 
     /**
      * @param Request $request
-     * @param User|null $user
+     * @param UserGroup $group
      * @return JsonResponse
-     * @throws NotFoundHttpException
      * @throws RequestValidationErrorException
      */
-    public function editAction(Request $request, User $user = null)
+    public function editAction(Request $request, UserGroup $group)
     {
-        if (is_null($user)) {
-            throw new NotFoundHttpException([
-                'error' => sprintf('User with id: %s - not found!', $request->get('id'))
-            ]);
-        }
+        $group->fillByRequest($request);
 
-        $user->fillByRequest($request);
-
-        $this->validate($user);
+        $this->validate($group);
 
         return new JsonResponse(
-            $this->userService->edit($user)
+            $this->userService->editGroup($group)
         );
     }
 
     /**
      * @param int $id
      * @return JsonResponse
-     * @throws NotFoundHttpException
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public function deleteAction(int $id)
     {
-        $this->userService->delete($id);
+        $this->userService->deleteGroup($id);
 
         return new JsonResponse(['delete' => true]);
     }

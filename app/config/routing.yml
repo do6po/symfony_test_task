@@ -17,8 +17,22 @@ api_users_edit:
 
 api_users_delete:
       path: /api/users/{id}
-      defaults: { _controller: AppBundle:User:delete}
+      defaults: { _controller: AppBundle:User:delete }
       methods: [DELETE]
+      requirements:
+          id: '\d+'
+
+api_group_create:
+      path: /api/groups
+      defaults: { _controller: AppBundle:UserGroup:create, _format: json }
+      methods: [POST]
+      requirements:
+          id: '\d+'
+
+api_group_edit:
+      path: /api/groups/{id}
+      defaults: { _controller: AppBundle:UserGroup:edit, _format: json }
+      methods: [PUT]
       requirements:
           id: '\d+'
 

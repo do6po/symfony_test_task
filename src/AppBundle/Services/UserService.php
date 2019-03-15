@@ -85,52 +85,34 @@ class UserService
     }
 
     /**
-     * @param string $name
+     * @param UserGroup $group
      * @return UserGroup
      */
-    public function addGroup(string $name): UserGroup
+    public function addGroup(UserGroup $group): UserGroup
     {
-        $group = new UserGroup();
-        $group->setName($name);
-
         $this->saveGroup($group);
 
         return $group;
     }
 
     /**
-     * @param User $user
+     * @param $user
      * @return User
-     * @throws NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
     public function edit($user): User
     {
-        $this->findOrFail($user->getId());
-
-        $this->userRepository->save($user);
+        $this->save($user);
 
         return $user;
     }
 
     /**
-     * @param int $id
-     * @param string $name
+     * @param UserGroup $group
      * @return UserGroup
-     * @throws NotFoundHttpException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
      */
-    public function editGroup(int $id, string $name): UserGroup
+    public function editGroup(UserGroup $group): UserGroup
     {
-        $group = $this->findGroupOrFail($id);
-
-        $group->setName($name);
-
-        $this->groupRepository->save($group);
+        $this->saveGroup($group);
 
         return $group;
     }

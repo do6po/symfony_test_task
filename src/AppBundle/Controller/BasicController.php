@@ -15,14 +15,14 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class BasicController extends Controller
 {
-
     /**
      * @param $object
      * @throws RequestValidationErrorException
      */
-    public function validate($object)
+    protected function validate($object)
     {
-        $constraintViolationList = $this->get('validator')->validate($object);
+        $constraintViolationList = $this->getValidator()
+            ->validate($object);
 
         if ($constraintViolationList->count()) {
             $errors = [];
@@ -33,5 +33,13 @@ class BasicController extends Controller
 
             throw new RequestValidationErrorException($errors);
         }
+    }
+
+    /**
+     * @return object|\Symfony\Component\Validator\Validator\TraceableValidator|\Symfony\Component\Validator\Validator\ValidatorInterface
+     */
+    protected function getValidator()
+    {
+        return $this->get('validator');
     }
 }
