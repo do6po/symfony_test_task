@@ -52,8 +52,8 @@ services:
           ipv4_address: 192.168.103.103
     ports:
       - 3306:3306
-#    volumes:
-#      - ./docker/storage/db:/var/lib/mysql
+    volumes:
+      - ./docker/storage/db/mysql:/var/lib/mysql
 
 networks:
     internal:
