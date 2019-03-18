@@ -33,6 +33,13 @@ class UserGroupController extends BasicController
         $this->userService = $userService;
     }
 
+    public function indexAction()
+    {
+        return new JsonResponse(
+            $this->userService->findGroupsAll()
+        );
+    }
+
     /**
      * @ParamConverter("group", class="AppBundle\Repository\UserGroupRepository")
      *
@@ -66,6 +73,50 @@ class UserGroupController extends BasicController
         return new JsonResponse(
             $this->userService->editGroup($group)
         );
+    }
+
+
+    public function showAction(UserGroup $group)
+    {
+        $users = $this->userService->findAllUserInGroup($group);
+
+        return new JsonResponse(
+            $users->toArray()
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param UserGroup $group
+     * @return JsonResponse
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function userAddAction(Request $request, UserGroup $group)
+    {
+        $userId = $request->get('user_id');
+        $this->userService->addUserToGroup($group, $userId);
+
+        return new JsonResponse(['added' => true]);
+    }
+
+    /**
+     * @param Request $request
+     * @param UserGroup $group
+     * @return JsonResponse
+     * @throws \AppBundle\Exceptions\NotFoundHttpException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function userDelAction(Request $request, UserGroup $group)
+    {
+        $userId = $request->get('user_id');
+        $this->userService->delUserFromGroup($group, $userId);
+
+        return new JsonResponse(['deleted' => true]);
     }
 
     /**

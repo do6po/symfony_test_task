@@ -41,6 +41,8 @@ class UserGroup implements \JsonSerializable, FillableFromRequestInterface
      */
     private $name;
 
+
+    //TODO Не работает сортировка
     /**
      * @var \Doctrine\Common\Collections\Collection|User[]
      *

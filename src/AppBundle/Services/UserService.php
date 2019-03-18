@@ -74,6 +74,15 @@ class UserService
     }
 
     /**
+     * @param UserGroup $group
+     * @return User[]|\Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function findAllUserInGroup(UserGroup $group)
+    {
+        return $group->users();
+    }
+
+    /**
      * @param $user
      * @return mixed
      */
@@ -141,6 +150,48 @@ class UserService
     public function deleteGroup(UserGroup $group): void
     {
         $this->groupRepository->remove($group);
+    }
+
+    /**
+     * @param UserGroup $group
+     * @param int $userId
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function addUserToGroup(UserGroup $group, int $userId)
+    {
+        $user = $this->findOrFail($userId);
+
+        $group->addUser($user);
+        $this->groupRepository->save($group);
+
+        $users = $this->findAllUserInGroup($group);
+
+        return $users->toArray();
+    }
+
+    /**
+     * @param $group
+     * @param $userId
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function delUserFromGroup(UserGroup $group, $userId)
+    {
+        $user = $this->findOrFail($userId);
+
+        $group->removeUser($user);
+        $this->groupRepository->save($group);
+
+        $users = $this->findAllUserInGroup($group);
+
+        return $users->toArray();
     }
 
     /**

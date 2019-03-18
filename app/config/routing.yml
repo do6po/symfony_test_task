@@ -22,6 +22,16 @@ api_users_delete:
       requirements:
           id: '\d+'
 
+api_groups_list:
+      path: /api/groups
+      defaults: { _controller: AppBundle:UserGroup:index }
+      methods: [GET]
+
+api_groups_show:
+      path: /api/groups/{id}
+      defaults: { _controller: AppBundle:UserGroup:show }
+      methods: [GET]
+
 api_group_create:
       path: /api/groups
       defaults: { _controller: AppBundle:UserGroup:create, _format: json }
@@ -40,6 +50,20 @@ api_group_delete:
       path: /api/groups/{id}
       defaults: { _controller: AppBundle:UserGroup:delete }
       methods: [DELETE]
+      requirements:
+          id: '\d+'
+
+api_add_user_in_group:
+      path: /api/groups/{id}/add
+      defaults: { _controller: AppBundle:UserGroup:userAdd }
+      methods: [PUT]
+      requirements:
+          id: '\d+'
+
+api_del_user_in_group:
+      path: /api/groups/{id}/del
+      defaults: { _controller: AppBundle:UserGroup:userDel }
+      methods: [PUT]
       requirements:
           id: '\d+'
 

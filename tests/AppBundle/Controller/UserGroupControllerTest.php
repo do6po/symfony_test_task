@@ -10,6 +10,7 @@ namespace Tests\AppBundle\Controller;
 
 
 use AppBundle\Entity\UserGroup;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Client;
 use Tests\AppBundle\Fixtures\UsersGroupsFixture;
 use Tests\Helpers\Traits\FixtureLoaderTrait;
@@ -314,6 +315,142 @@ class UserGroupControllerTest extends WebTestCase
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertJsonStringEqualsJsonString(json_encode([
             'message' => 'Not Found!',
+        ]), $response->getContent());
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
+    public function testAddToGroup()
+    {
+        $userId = 1;
+        $groupId = 3;
+
+        $this->assertDatabaseMissing('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+
+        $this->client->request(
+            'PUT',
+            sprintf('/api/groups/%s/add', $groupId),
+            [], [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'user_id' => $userId,
+            ])
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $this->assertEquals(json_encode(['added' => true]), $response->getContent());
+
+        $this->assertDatabaseHas('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Query\QueryException
+     */
+    public function testDelFromGroup()
+    {
+        $userId = 1;
+        $groupId = 1;
+
+        $this->assertDatabaseHas('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+
+        $this->client->request(
+            'PUT',
+            sprintf('/api/groups/%s/del', $groupId),
+            [], [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'user_id' => $userId,
+            ])
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $this->assertEquals(json_encode(['deleted' => true]), $response->getContent());
+
+        $this->assertDatabaseMissing('users_groups', [
+            'user_id' => $userId,
+            'user_group_id' => $groupId,
+        ]);
+    }
+
+    public function testIndex()
+    {
+        $this->client->request(
+            'GET',
+            sprintf('/api/groups'),
+            [], [],
+            ['CONTENT_TYPE' => 'application/json']
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            [
+                'id' => 1,
+                'name' => 'Group name 1',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Group name 2',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Group name 3',
+            ],
+            [
+                'id' => 4,
+                'name' => 'Group name 4',
+            ],
+        ]), $response->getContent());
+    }
+
+    public function testShow()
+    {
+        $groupId = 2;
+        $this->client->request(
+            'GET',
+            sprintf('/api/groups/%s', $groupId),
+            [], [],
+            ['CONTENT_TYPE' => 'application/json']
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $this->assertJsonStringEqualsJsonString(json_encode([
+            [
+                'id' => 1,
+                'name' => 'Username1',
+                'email' => 'username1@email.com',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Username2',
+                'email' => 'username2@email.com',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Username3',
+                'email' => 'username3@email.com',
+            ],
         ]), $response->getContent());
     }
 }
