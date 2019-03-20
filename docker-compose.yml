@@ -15,7 +15,7 @@ services:
       - ./docker/storage/logs/web:/var/log/nginx
       - ./:/app:rw,cached
     working_dir: /app
-    links:
+    depends_on:
       - db
       - php
     restart: always
@@ -37,8 +37,9 @@ services:
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
     restart: always
-    links:
+    depends_on:
       - db
+    entrypoint: ["/bin/sh", "/usr/bin/php_init.sh"]
 
   db:
     image: mariadb

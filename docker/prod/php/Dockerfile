@@ -22,4 +22,6 @@ RUN composer --version
 RUN docker-php-ext-configure intl \
     && docker-php-ext-install pdo pdo_mysql opcache intl
 
-CMD ["php-fpm"]
+COPY ./docker/prod/php/php_init.sh /usr/bin/
+RUN chmod +x /usr/bin/php_init.sh
+
