@@ -8,3 +8,9 @@ services:
   php:
     build:
       dockerfile: docker/dev/php/Dockerfile
+      args:
+        - CURRENT_UID=${CURRENT_UID}
+        - CURRENT_USERNAME=${CURRENT_USERNAME}
+    user: ${CURRENT_UID}:${CURRENT_GID}
+    environment:
+      - CURRENT_USERNAME=${CURRENT_USERNAME}
