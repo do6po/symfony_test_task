@@ -9,7 +9,6 @@
 namespace AppBundle\EventListener;
 
 
-use AppBundle\Exceptions\BasicApiException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;

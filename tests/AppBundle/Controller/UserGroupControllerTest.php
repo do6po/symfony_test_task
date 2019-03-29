@@ -369,7 +369,7 @@ class UserGroupControllerTest extends WebTestCase
         ]);
 
         $this->client->request(
-            'PUT',
+            'DELETE',
             sprintf('/api/groups/%s/del', $groupId),
             [], [],
             ['CONTENT_TYPE' => 'application/json'],

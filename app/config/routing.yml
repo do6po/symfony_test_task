@@ -53,17 +53,17 @@ api_group_delete:
       requirements:
           id: '\d+'
 
-api_add_user_in_group:
+api_add_user_to_group:
       path: /api/groups/{id}/add
       defaults: { _controller: AppBundle:UserGroup:userAdd }
       methods: [PUT]
       requirements:
           id: '\d+'
 
-api_del_user_in_group:
+api_del_user_from_group:
       path: /api/groups/{id}/del
       defaults: { _controller: AppBundle:UserGroup:userDel }
-      methods: [PUT]
+      methods: [DELETE]
       requirements:
           id: '\d+'
 
