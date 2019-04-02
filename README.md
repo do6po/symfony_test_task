@@ -19,6 +19,14 @@ vagrant plugin install vagrant-hostmanager
 vagrant up
 ```
 - from docker:
+
+for dev
 ```bash
-make install
+make dev
 ```
+
+for prod
+```bash
+make prod
+```
+
